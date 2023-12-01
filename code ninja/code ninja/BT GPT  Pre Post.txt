@@ -1,0 +1,187 @@
+BT GPT Write a Program to create a Binary Tree and perform
+following nonrecursive operations on it. a. Preorder
+Traversal, b. Postorder Traversal, c. Count total no. of
+nodes, d. Display height of a tree.
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Node structure for the binary tree
+struct Node {
+    int data;
+    struct Node* left;
+    struct Node* right;
+};
+
+// Function to create a new node
+struct Node* createNode(int value) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = value;
+    newNode->left = newNode->right = NULL;
+    return newNode;
+}
+
+// Function to perform non-recursive preorder traversal
+void preorderTraversal(struct Node* root) {
+    if (root == NULL)
+        return;
+
+    struct Node* stack[100];
+    int top = -1;
+
+    stack[++top] = root;
+
+    while (top >= 0) {
+        struct Node* current = stack[top--];
+        printf("%d ", current->data);
+
+        if (current->right)
+            stack[++top] = current->right;
+
+        if (current->left)
+            stack[++top] = current->left;
+    }
+}
+
+// Function to perform non-recursive postorder traversal
+void postorderTraversal(struct Node* root) {
+    if (root == NULL)
+        return;
+
+    struct Node* stack[100];
+    int top = -1;
+
+    do {
+        while (root) {
+            if (root->right)
+                stack[++top] = root->right;
+            stack[++top] = root;
+            root = root->left;
+        }
+
+        root = stack[top--];
+
+        if (root->right && stack[top] == root->right) {
+            stack[top--] = root;
+            stack[++top] = root->right;
+            root = NULL;
+        } else {
+            printf("%d ", root->data);
+            root = NULL;
+        }
+    } while (top >= 0);
+}
+
+// Function to count the total number of nodes in the tree
+int countNodes(struct Node* root) {
+    if (root == NULL)
+        return 0;
+
+    struct Node* stack[100];
+    int top = -1;
+    int count = 0;
+
+    do {
+        while (root) {
+            stack[++top] = root;
+            root = root->left;
+        }
+
+        root = stack[top--];
+        count++;
+
+        root = root->right;
+
+    } while (root || top >= 0);
+
+    return count;
+}
+
+// Function to display the height of the tree
+int treeHeight(struct Node* root) {
+    if (root == NULL)
+        return 0;
+
+    struct Node* stack[100];
+    int top = -1;
+    int height = 0;
+
+    do {
+        while (root) {
+            stack[++top] = root;
+            root = root->left;
+        }
+
+        root = stack[top--];
+
+        if (root->right && (top == -1 || stack[top] != root->right)) {
+            stack[++top] = root;
+            root = root->right;
+        } else {
+            if (top + 1 > height)
+                height = top + 1;
+
+            root = NULL;
+        }
+
+    } while (top >= 0);
+
+    return height;
+}
+
+int main() {
+    struct Node* root = NULL;
+    int choice, value;
+
+    do {
+        printf("\nBinary Tree Operations:\n");
+        printf("1. Insert\n");
+        printf("2. Preorder Traversal\n");
+        printf("3. Postorder Traversal\n");
+        printf("4. Count Total Nodes\n");
+        printf("5. Display Tree Height\n");
+        printf("6. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter the value to insert: ");
+                scanf("%d", &value);
+                if (root == NULL)
+                    root = createNode(value);
+                else
+                    insert(root, value);
+                break;
+
+            case 2:
+                printf("Preorder Traversal: ");
+                preorderTraversal(root);
+                printf("\n");
+                break;
+
+            case 3:
+                printf("Postorder Traversal: ");
+                postorderTraversal(root);
+                printf("\n");
+                break;
+
+            case 4:
+                printf("Total Number of Nodes: %d\n", countNodes(root));
+                break;
+
+            case 5:
+                printf("Tree Height: %d\n", treeHeight(root));
+                break;
+
+            case 6:
+                printf("Exiting program.\n");
+                break;
+
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    } while (choice != 6);
+
+    return 0;
+}

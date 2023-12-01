@@ -1,0 +1,120 @@
+//prims using adj list
+#include <stdio.h>
+#include <stdbool.h>
+#include <limits.h>
+
+
+#define MAX_VERTICES 100
+#define INF INT_MAX
+
+
+typedef struct {
+    int src;
+    int dest;
+    int weight;
+} Edge;
+
+
+typedef struct {
+    int numVertices;
+    int numEdges;
+    Edge edges[MAX_VERTICES];
+} Graph;
+
+
+int findMinKey(int key[], bool mstSet[], int numVertices) {
+    int minKey = INF;
+    int minIndex;
+
+
+    for (int v = 0; v < numVertices; v++) {
+        if (mstSet[v] == false && key[v] < minKey) {
+            minKey = key[v];
+            minIndex = v;
+        }
+    }
+
+
+    return minIndex;
+}
+
+
+void printMST(int parent[], int key[], int numVertices) {
+    printf("Minimal Spanning Tree:\n");
+    for (int i = 1; i < numVertices; i++) {
+        printf("%d - %d\n", parent[i], i);
+    }
+}
+
+
+void primMST(Graph* graph) {
+    int numVertices = graph->numVertices;
+    int parent[MAX_VERTICES];
+    int key[MAX_VERTICES];
+    bool mstSet[MAX_VERTICES];
+
+
+    
+    for (int v = 0; v < numVertices; v++) {
+        key[v] = INF;
+        mstSet[v] = false;
+    }
+
+
+    
+    key[0] = 0;
+    parent[0] = -1;
+
+
+    
+    for (int count = 0; count < numVertices - 1; count++) {
+        int u = findMinKey(key, mstSet, numVertices);
+        mstSet[u] = true;
+
+
+        
+        for (int v = 0; v < numVertices; v++) {
+            int weight = graph->edges[u * numVertices + v].weight;
+            if (graph->edges[u * numVertices + v].dest == v && mstSet[v] == false &&
+                weight < key[v]) {
+                parent[v] = u;
+                key[v] = weight;
+            }
+        }
+    }
+
+
+    printMST(parent, key, numVertices);
+}
+
+
+int main() {
+    Graph graph;
+    printf("Enter the number of vertices in the graph: ");
+    scanf("%d", &graph.numVertices);
+
+
+    printf("Enter the adjacency list as (source, destination, weight):\n");
+    for (int i = 0; i < graph.numVertices; i++) {
+        for (int j = 0; j < graph.numVertices; j++) {
+            int weight;
+            scanf("%d", &weight);
+
+
+            if (weight != 0) {
+                graph.edges[i * graph.numVertices + j].src = i;
+                graph.edges[i * graph.numVertices + j].dest = j;
+                graph.edges[i * graph.numVertices + j].weight = weight;
+                graph.numEdges++;
+            }
+        }
+    }
+
+
+    primMST(&graph);
+
+
+    return 0;
+}
+
+

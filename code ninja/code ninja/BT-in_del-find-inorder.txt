@@ -1,0 +1,110 @@
+display its mirror image with and without disturbing the original tree. Also display height
+of a tree using nonrecursion. take input from user
+
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *left;
+    struct node *right;
+};
+
+// Function to create a new node with the given data
+struct node* createNode(int data) {
+    struct node* newNode = (struct node*)malloc(sizeof(struct node));
+    newNode->data = data;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    return newNode;
+}
+
+// Function to insert a node in the binary search tree
+struct node* insertNode(struct node* root, int data) {
+    if (root == NULL) {
+        root = createNode(data);
+    } else if (data < root->data) {
+        root->left = insertNode(root->left, data);
+    } else {
+        root->right = insertNode(root->right, data);
+    }
+    return root;
+}
+
+// Function to display the mirror image of a binary tree
+struct node* mirror(struct node* root) {
+    if (root == NULL) {
+        return NULL;
+    } else {
+        struct node* temp;
+        mirror(root->left);
+        mirror(root->right);
+        temp = root->left;
+        root->left = root->right;
+        root->right = temp;
+    }
+    return root;
+}
+
+// Function to display the binary search tree in inorder traversal
+void inorderTraversal(struct node* root) {
+    if (root == NULL) {
+        return;
+    }
+    inorderTraversal(root->left);
+    printf("%d ", root->data);
+    inorderTraversal(root->right);
+}
+
+// Function to display the height of a binary search tree using non-recursion
+int height(struct node* root) {
+    int max_depth = 0;
+    struct node* current = root;
+    while (current != NULL) {
+        if (current->left == NULL) {
+            current = current->right;
+            max_depth++;
+        } else {
+            struct node* pre = current->left;
+            while (pre->right != NULL && pre->right != current) {
+                pre = pre->right;
+            }
+            if (pre->right == NULL) {
+                pre->right = current;
+                current = current->left;
+                max_depth++;
+            } else {
+                pre->right = NULL;
+                current = current->right;
+            }
+        }
+    }
+    return max_depth;
+}
+
+int main() {
+    struct node* root = NULL;
+    int n, data;
+
+    printf("Enter the number of nodes: ");
+    scanf("%d", &n);
+
+    printf("Enter the values of nodes: ");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &data);
+        root = insertNode(root, data);
+    }
+
+    printf("Original tree in inorder traversal: ");
+    inorderTraversal(root);
+
+    struct node* mirrorRoot = mirror(root);
+    printf("\nMirror tree in inorder traversal: ");
+    inorderTraversal(mirrorRoot);
+
+    printf("\nHeight of the tree is %d", height(root));
+
+    return 0;
+}
+
+In this program, the node struct represents a node in the binary search tree. The createNode function creates a new node with the given data. The insertNode function inserts a node in the binary search tree. The mirror function displays the mirror image of a binary tree. The inorderTraversal function displays the binary search tree in inorder traversal. The height function displays the height of a binary

@@ -1,0 +1,183 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+struct node{
+    int data;
+    struct node* left;
+    struct  node* right;
+};
+
+struct node* createnode(int value){
+    struct node* newnode= (struct node*)malloc(sizeof(struct node));
+    newnode->data=value;
+    newnode->left=newnode->right= NULL;
+    return newnode;
+}
+
+struct node* insert(struct node*root, int value){
+    struct node* newnode= createnode(value);
+
+     if (root==NULL){
+        return newnode;
+     }
+
+     struct node* current =root;
+     struct node* parent =NULL;
+
+    while(current!=NULL){
+            parent=current;
+        if(value<current->data){
+            current=current->left;
+        }
+        else if(value>current->data){
+            current=current->right;
+        }
+        else{
+            free(newnode);
+            return root;
+        }
+
+    }
+    if(value<parent->data){
+        parent->left=newnode;
+    }
+    else{
+        parent->right=newnode;
+    }
+    return root;
+}
+
+struct node* minval(struct node* root){
+if (root==NULL)
+    return NULL;
+while(root->left!=NULL){
+    root=root->left;
+}
+return root;
+}
+
+
+
+
+
+void postorder(struct node* root){
+if (root==NULL)return ;
+struct node* s1[100];
+struct node* s2[100];
+int top1=-1,top2=-1;
+
+s1[++top1]=root;
+
+while(top1>=0){
+
+   struct node* current= s1[top1--];
+   s2[++top2]=current;
+
+   if(current->left!=NULL){
+    s1[++top1]=current->left;
+   }
+   if(current->right!=NULL){
+    s1[++top1]=current->right;
+   }
+}
+while(top2>=0){
+    printf("%d ", s2[top2--]->data);
+    }
+
+}
+
+
+
+
+void search(struct node* root, int value){
+ while(root!=NULL){
+    if (root->data==value){
+    printf("\n element found\n\n");
+    break;
+    }
+    else if(value<root->data){
+        root=root->left;
+    }
+    else {
+        root=root->right;
+    }
+ }
+}
+
+
+void mirrorimage(struct node* root){
+
+struct node* stack[100];
+int top=-1;
+while(root!=NULL || top>=0){
+    while(root!= NULL){
+        struct node* temp=root->left;
+        root->left=root->right;
+        root->right=temp;
+
+        stack[++top]=root;
+        root=root->left;
+
+    }
+    root=stack[top--];
+    printf("%d ", root->data);
+    root=root->right;
+
+}
+if(root==NULL){
+    printf("Element not found");
+}
+}
+
+
+
+
+
+int main() {
+    struct node* root = NULL;
+    int choice, value,count ;
+    do {
+        printf("Binary Search Tree Operations:\n");
+        printf("1. Insert\n");
+        printf("2. mirror\n");
+
+        printf("3. Postorder Traversal\n");
+ 
+        printf("4. search\n");
+
+        printf("9. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter the value to insert: ");
+                scanf("%d", &value);
+                root = insert(root, value);
+                break;
+            case 2:
+                printf("mirror image: ");
+                mirrorimage(root);
+                break;
+            case 3:
+                printf("Postorder Traversal: ");
+                postorder(root);
+                printf("\n");
+                break;
+            case 4:
+                printf("enter the value to search: \n");
+                scanf("%d", &value);
+                search(root,value);
+                break;
+           
+            case 5:
+                printf("Exiting program.\n");
+                break;
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    } while (choice != 5);
+
+    return 0;
+}
+

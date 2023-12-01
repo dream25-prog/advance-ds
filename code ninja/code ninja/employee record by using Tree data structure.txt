@@ -1,0 +1,115 @@
+Search a particular employee record by using Tree data structure.
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define the structure for an employee record
+struct Employee {
+    int empId;
+    char name[50];
+    // Add other fields as needed
+};
+
+// Define the structure for a node in the BST
+struct Node {
+    struct Employee data;
+    struct Node *left, *right;
+};
+
+// Function to create a new node
+struct Node* createNode(struct Employee empData) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = empData;
+    newNode->left = newNode->right = NULL;
+    return newNode;
+}
+
+// Function to insert a new node into the BST
+struct Node* insert(struct Node* root, struct Employee empData) {
+    if (root == NULL) {
+        return createNode(empData);
+    }
+
+    if (empData.empId < root->data.empId) {
+        root->left = insert(root->left, empData);
+    } else if (empData.empId > root->data.empId) {
+        root->right = insert(root->right, empData);
+    }
+
+    return root;
+}
+
+// Function to search for an employee record in the BST
+struct Node* search(struct Node* root, int empId) {
+    if (root == NULL || root->data.empId == empId) {
+        return root;
+    }
+
+    if (empId < root->data.empId) {
+        return search(root->left, empId);
+    }
+
+    return search(root->right, empId);
+}
+
+// Function to perform inorder traversal and display the records in ascending order
+void inorderTraversal(struct Node* root) {
+    if (root != NULL) {
+        inorderTraversal(root->left);
+        printf("Emp ID: %d, Name: %s\n", root->data.empId, root->data.name);
+        inorderTraversal(root->right);
+    }
+}
+
+int main() {
+    struct Node* root = NULL;
+    int choice, empId;
+    struct Employee empData;
+
+    do {
+        printf("\n1. Insert Employee Record\n");
+        printf("2. Search Employee Record\n");
+        printf("3. Display Records (Sorted by Emp ID)\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter Employee ID: ");
+                scanf("%d", &empData.empId);
+                printf("Enter Employee Name: ");
+                scanf("%s", empData.name);
+                root = insert(root, empData);
+                break;
+
+            case 2:
+                printf("Enter Employee ID to Search: ");
+                scanf("%d", &empId);
+                struct Node* result = search(root, empId);
+                if (result != NULL) {
+                    printf("Employee Record Found - Emp ID: %d, Name: %s\n", result->data.empId, result->data.name);
+                } else {
+                    printf("Employee Record Not Found\n");
+                }
+                break;
+
+            case 3:
+                printf("Employee Records Sorted by Emp ID:\n");
+                inorderTraversal(root);
+                break;
+
+            case 4:
+                printf("Exiting the program.\n");
+                break;
+
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+
+    } while (choice != 4);
+
+    // TODO: Free memory allocated for the nodes in the BST
+
+    return 0;
+}

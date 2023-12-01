@@ -1,0 +1,73 @@
+//Prims using adj matrix
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+
+#define MAX_NODES 100
+
+
+int adjMatrix[MAX_NODES][MAX_NODES];
+int numNodes;
+
+
+int minKey(int key[], int mstSet[]) {
+    int min = INT_MAX, minIndex, i;
+    for (i = 0; i < numNodes; i++) {
+        if (!mstSet[i] && key[i] < min) {
+            min = key[i];
+            minIndex = i;
+        }
+    }
+    return minIndex;
+}
+
+
+void primMST() {
+    int parent[MAX_NODES];
+    int key[MAX_NODES];
+    int mstSet[MAX_NODES];
+    int i, j;
+    
+    
+    for (i = 0; i < numNodes; i++) {
+        key[i] = INT_MAX;
+        mstSet[i] = 0;
+    }
+    
+    
+    key[0] = 0;
+    parent[0] = -1;
+    
+    for (i = 0; i < numNodes-1; i++) {
+        int u = minKey(key, mstSet);
+        mstSet[u] = 1;
+        for (j = 0; j < numNodes; j++) {
+            if (adjMatrix[u][j] && !mstSet[j] && adjMatrix[u][j] < key[j]) {
+                parent[j] = u;
+                key[j] = adjMatrix[u][j];
+            }
+        }
+    }
+    
+    // Print the MST
+    printf("MST using Prim's Algorithm:\n");
+    for (i = 1; i < numNodes; i++) {
+        printf("%d - %d\n", parent[i], i);
+    }
+}
+
+
+int main() {
+    int i, j;
+    printf("Enter the number of nodes: ");
+    scanf("%d", &numNodes);
+    printf("Enter the adjacency matrix:\n");
+    for (i = 0; i < numNodes; i++) {
+        for (j = 0; j < numNodes; j++) {
+            scanf("%d", &adjMatrix[i][j]);
+        }
+    }
+    primMST();
+    return 0;
+}

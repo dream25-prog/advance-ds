@@ -1,0 +1,96 @@
+//Kruskal using adj list 
+#include <stdio.h>
+#include <stdlib.h>
+
+
+#define MAX_NODES 1000
+#define MAX_EDGES 100000
+
+
+struct Edge {
+    int src, dest, weight;
+};
+
+
+struct Subset {
+    int parent;
+    int rank;
+};
+
+
+int numNodes, numEdges;
+struct Edge edges[MAX_EDGES];
+int parent[MAX_NODES], rank[MAX_NODES];
+
+
+int find(int node) {
+    if (parent[node] != node) {
+        parent[node] = find(parent[node]);
+    }
+    return parent[node];
+}
+
+
+void unionSets(int node1, int node2) {
+    int parent1 = find(node1);
+    int parent2 = find(node2);
+    if (rank[parent1] > rank[parent2]) {
+        parent[parent2] = parent1;
+    } else if (rank[parent1] < rank[parent2]) {
+        parent[parent1] = parent2;
+    } else {
+        parent[parent2] = parent1;
+        rank[parent1]++;
+    }
+}
+
+
+int compare(const void *a, const void *b) {
+    struct Edge *edge1 = (struct Edge *) a;
+    struct Edge *edge2 = (struct Edge *) b;
+    return edge1->weight - edge2->weight;
+}
+
+
+void kruskal() {
+    struct Subset subsets[numNodes];
+    for (int i = 0; i < numNodes; i++) {
+        subsets[i].parent = i;
+        subsets[i].rank = 0;
+    }
+    int mstEdges = 0, mstWeight = 0, i = 0;
+    while (mstEdges < numNodes - 1 && i < numEdges) {
+        struct Edge nextEdge = edges[i++];
+        int parent1 = find(nextEdge.src);
+        int parent2 = find(nextEdge.dest);
+        if (parent1 != parent2) {
+            mstWeight += nextEdge.weight;
+            unionSets(parent1, parent2);
+            mstEdges++;
+        }
+    }
+    printf("Minimal Spanning Tree weight: %d\n", mstWeight);
+}
+
+
+int main() {
+    
+    scanf("%d %d", &numNodes, &numEdges);
+    for (int i = 0; i < numEdges; i++) {
+        int src, dest, weight;
+        scanf("%d %d %d", &src, &dest, &weight);
+        edges[i].src = src;
+        edges[i].dest = dest;
+        edges[i].weight = weight;
+    }
+    
+    qsort(edges, numEdges, sizeof(struct Edge), compare);
+    
+    for (int i = 0; i < numNodes; i++) {
+        parent[i] = i;
+        rank[i] = 0;
+    }
+    
+    kruskal();
+    return 0;
+}

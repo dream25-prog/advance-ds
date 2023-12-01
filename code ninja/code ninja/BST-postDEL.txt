@@ -1,0 +1,219 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+struct node{
+    int data;
+    struct node* left;
+    struct  node* right;
+};
+
+struct node* createnode(int value){
+    struct node* newnode= (struct node*)malloc(sizeof(struct node));
+    newnode->data=value;
+    newnode->left=newnode->right= NULL;
+    return newnode;
+}
+
+struct node* insert(struct node*root, int value){
+    struct node* newnode= createnode(value);
+
+     if (root==NULL){
+        return newnode;
+     }
+
+     struct node* current =root;
+     struct node* parent =NULL;
+
+    while(current!=NULL){
+            parent=current;
+        if(value<current->data){
+            current=current->left;
+        }
+        else if(value>current->data){
+            current=current->right;
+        }
+        else{
+            free(newnode);
+            return root;
+        }
+
+    }
+    if(value<parent->data){
+        parent->left=newnode;
+    }
+    else{
+        parent->right=newnode;
+    }
+    return root;
+}
+
+struct node* minval(struct node* root){
+if (root==NULL)
+    return NULL;
+while(root->left!=NULL){
+    root=root->left;
+}
+return root;
+}
+
+
+
+
+void postorder(struct node* root){
+if (root==NULL)return ;
+struct node* s1[100];
+struct node* s2[100];
+int top1=-1,top2=-1;
+
+s1[++top1]=root;
+
+while(top1>=0){
+
+   struct node* current= s1[top1--];
+   s2[++top2]=current;
+
+   if(current->left!=NULL){
+    s1[++top1]=current->left;
+   }
+   if(current->right!=NULL){
+    s1[++top1]=current->right;
+   }
+}
+while(top2>=0){
+    printf("%d ", s2[top2--]->data);
+    }
+
+}
+
+
+void inorder(struct node* root){
+if (root==NULL) return;
+
+struct node* s[100];
+int top=-1;
+
+struct node* current=root;
+
+while (current!=NULL || top!= -1 ){
+    while(current!= NULL){
+        s[++top]=current;
+        current= current->left;
+     }
+
+   current= s[top--];
+   printf("%d ", current->data);
+   current=current->right;
+  }
+}
+
+
+
+
+
+
+struct node* deletenode(struct node* root, int value){
+   if (root==NULL){
+    return NULL;
+   }
+
+   struct node*current= root;
+   struct node* parent=NULL;
+
+   while(current!=NULL && current->data!=value){
+    parent=current;
+    if(value<current->data){
+        current=current->left;
+    }
+    else if(value>current->data){
+        current=current->right;
+    }
+   }
+   if(current==NULL){
+    printf("\nKey not found\n");
+   }
+   //if current has only 1 child
+   if(current->left==NULL){
+    struct node*temp=current->right;
+    free(current);
+    if(parent==NULL){
+        return temp;
+    }
+    else if(current=parent->left){
+        parent->left=temp;
+    }
+    else{
+        parent->right=temp;
+    }
+
+   }
+   else if(current->right==NULL){
+    struct node*temp=current->left;
+    free(current);
+    if(parent==NULL){
+        return temp;
+    }
+    else if(current==parent->left){
+        parent->left=temp;
+    }
+    else{
+        parent->right=temp;
+    }
+   }
+   //if it has both children
+   else{
+    struct node* successor=minval(current->right);
+    current->data=successor->data;
+    current->right=deletenode(current->right,successor->data);
+   }
+printf("The tree after deletion of the node\n");
+inorder(root);
+return root;
+
+
+
+}
+
+int main() {
+    struct node* root = NULL;
+    int choice, value,count ;
+    do {
+        printf("Binary Search Tree Operations:\n");
+        printf("1. Insert\n");
+
+        printf("2. Postorder Traversal\n");
+
+        printf("3. delete\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter the value to insert: ");
+                scanf("%d", &value);
+                root = insert(root, value);
+                break;
+            case 2:
+             
+                printf("Postorder Traversal: ");
+                postorder(root);
+                printf("\n");
+                break;
+            case 3:
+
+                printf("enter the value to delete.\n");
+                scanf("%d", &value);
+                deletenode(root,value);
+                break;
+            case 4:
+                printf("Exiting program.\n");
+                break;
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    } while (choice != 4);
+
+    printf("\n\n no of nodes %d", count);
+    return 0;
+}
+

@@ -1,0 +1,150 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_VERTICES 100
+
+struct Queue {
+    int front, rear, size;
+    unsigned capacity;
+    int* array;
+};
+
+struct Queue* createQueue(unsigned capacity) {
+    struct Queue* queue = (struct Queue*)malloc(sizeof(struct Queue));
+    queue->capacity = capacity;
+    queue->front = queue->size = 0;
+    queue->rear = capacity - 1;
+    queue->array = (int*)malloc(queue->capacity * sizeof(int));
+    return queue;
+}
+
+int isQueueEmpty(struct Queue* queue) {
+    return (queue->size == 0);
+}
+
+void enqueue(struct Queue* queue, int item) {
+    if (isQueueEmpty(queue)) {
+        queue->front = 0;
+    }
+    queue->rear = (queue->rear + 1) % queue->capacity;
+    queue->array[queue->rear] = item;
+    queue->size += 1;
+}
+
+int dequeue(struct Queue* queue) {
+    if (isQueueEmpty(queue))
+        return -1;
+    int item = queue->array[queue->front];
+    queue->front = (queue->front + 1) % queue->capacity;
+    queue->size -= 1;
+    return item;
+}
+
+struct Graph {
+    int vertices;
+    int** adjacencyMatrix;
+};
+
+struct Graph* createGraph(int vertices) {
+    struct Graph* graph = (struct Graph*)malloc(sizeof(struct Graph));
+    graph->vertices = vertices;
+
+    graph->adjacencyMatrix = (int**)malloc(vertices * sizeof(int*));
+    for (int i = 0; i < vertices; i++) {
+        graph->adjacencyMatrix[i] = (int*)malloc(vertices * sizeof(int));
+        for (int j = 0; j < vertices; j++) {
+            graph->adjacencyMatrix[i][j] = 0;
+        }
+    }
+
+    return graph;
+}
+
+void addEdge(struct Graph* graph, int src, int dest) {
+    graph->adjacencyMatrix[src][dest] = 1;
+    graph->adjacencyMatrix[dest][src] = 1;
+}
+
+void printAdjacencyMatrix(struct Graph* graph) {
+    printf("Adjacency Matrix:\n");
+    for (int i = 0; i < graph->vertices; i++) {
+        for (int j = 0; j < graph->vertices; j++) {
+            printf("%d ", graph->adjacencyMatrix[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+void BFS(struct Graph* graph, int startVertex) {
+    struct Queue* queue = createQueue(MAX_VERTICES);
+    int visited[MAX_VERTICES] = {0};
+
+    printf("BFS Traversal starting from vertex %d: ", startVertex);
+    printf("%d ", startVertex);
+    visited[startVertex] = 1;
+    enqueue(queue, startVertex);
+
+    while (!isQueueEmpty(queue)) {
+        int currentVertex = dequeue(queue);
+
+        for (int i = 0; i < graph->vertices; i++) {
+            if (graph->adjacencyMatrix[currentVertex][i] == 1 && !visited[i]) {
+                printf("%d ", i);
+                visited[i] = 1;
+                enqueue(queue, i);
+            }
+        }
+    }
+
+    printf("\n");
+    free(queue);
+}
+
+void DFSRecursive(struct Graph* graph, int vertex, int visited[]) {
+    visited[vertex] = 1;
+    printf("%d ", vertex);
+
+    for (int i = 0; i < graph->vertices; i++) {
+        if (graph->adjacencyMatrix[vertex][i] == 1 && !visited[i]) {
+            DFSRecursive(graph, i, visited);
+        }
+    }
+}
+
+void DFS(struct Graph* graph, int startVertex) {
+    printf("DFS Traversal starting from vertex %d: ", startVertex);
+    int visited[MAX_VERTICES] = {0};
+    DFSRecursive(graph, startVertex, visited);
+    printf("\n");
+}
+
+int main() {
+    int vertices, edges, src, dest;
+
+    printf("Enter the number of vertices in the graph: ");
+    scanf("%d", &vertices);
+
+    struct Graph* graph = createGraph(vertices);
+
+    printf("Enter the number of edges in the graph: ");
+    scanf("%d", &edges);
+
+    printf("Enter the edges (source destination):\n");
+    for (int i = 0; i < edges; i++) {
+        scanf("%d %d", &src, &dest);
+        addEdge(graph, src, dest);
+    }
+
+    printAdjacencyMatrix(graph);
+
+    printf("\n");
+
+    int startVertex;
+    printf("Enter the starting vertex for traversals: ");
+    scanf("%d", &startVertex);
+
+    BFS(graph, startVertex);
+    DFS(graph, startVertex);
+
+    return 0;
+}
